@@ -1,6 +1,6 @@
 {
-    "name": "bee_feeder",
-    "short_name": "bee_feeder",
+    "name": "bee_feeder_ui",
+    "short_name": "bee_feeder_ui",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

@@ -1,12 +1,11 @@
 buildscript {
-    ext.kotlin_version = '1.7.10'
     repositories {
         google()
         mavenCentral()
     }
-    dependencies { 
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.google.gms:google-services:4.4.2'
+    dependencies {
+        classpath "com.android.tools.build:gradle:8.0.2" // Gradle Plugin
+        classpath "com.google.gms:google-services:4.3.15" // Firebase Plugin
     }
 }
 
@@ -16,15 +15,14 @@ allprojects {
         mavenCentral()
     }
 }
+android {
+    ...
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
 
-rootProject.buildDir = "../build"
-subprojects {
-    project.buildDir = "${rootProject.buildDir}/${project.name}"
-}
-subprojects {
-    project.evaluationDependsOn(":app")
-}
-
-tasks.register("clean", Delete) {
-    delete rootProject.buildDir
+    kotlinOptions {
+        jvmTarget = "11"
+    }
 }

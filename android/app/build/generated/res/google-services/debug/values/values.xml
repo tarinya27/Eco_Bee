@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="gcm_defaultSenderId" translatable="false">282078817099</string>
+    <string name="google_api_key" translatable="false">AIzaSyAQKvZ8yf5IY7SShRybfe7O9nH39BubW14</string>
+    <string name="google_app_id" translatable="false">1:282078817099:android:8c01d68b37dece4770d6ce</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyAQKvZ8yf5IY7SShRybfe7O9nH39BubW14</string>
+    <string name="google_storage_bucket" translatable="false">beefeeder-d96ba.firebasestorage.app</string>
+    <string name="project_id" translatable="false">beefeeder-d96ba</string>
+</resources>
