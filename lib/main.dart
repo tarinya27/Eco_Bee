@@ -1,11 +1,12 @@
-import 'package:bee_feeder_ui/automation.dart';
-import 'package:bee_feeder_ui/dashboard.dart';
-import 'package:bee_feeder_ui/feeding_history.dart';
+import 'package:new_bee/automation.dart';
+import 'package:new_bee/dashboard.dart';
+import 'package:new_bee/feeding_history.dart';
 import 'package:flutter/material.dart';
-import 'package:bee_feeder_ui/welcome.dart';
-import 'package:bee_feeder_ui/signup.dart';
-import 'package:bee_feeder_ui/signin.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:new_bee/welcome.dart';
+import 'package:new_bee/signup.dart';
+import 'package:new_bee/signin.dart';
+import 'package:new_bee/welcome.dart';
+
 
 void main() {
   runApp(MyApp());
@@ -19,13 +20,13 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
 
-      // home: WelcomeScreen(),
-        home: Signup(),
-      //home: Signin(),
+      //home: WelcomeScreen(),
+      //home: Signup(),
+      //home: SignIn(),
       //home: ForgotPass(),
       //home: Dashboard(),
       //home: AutomationScreen(),
-      //home: FeedingHistoryScreen(), 
+      home: FeedingHistoryScreen(), 
     );
   }
 }

@@ -1,4 +1,4 @@
-# bee_feeder_ui
+# new_bee
 
 A new Flutter project.
 

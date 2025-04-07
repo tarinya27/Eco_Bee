@@ -1,4 +1,4 @@
-import 'package:bee_feeder_ui/dashboard.dart';
+import 'package:new_bee/dashboard.dart';
 import 'package:flutter/material.dart';
 
 class AutomationScreen extends StatefulWidget {
@@ -293,3 +293,4 @@ class _AutomationScreenState extends State<AutomationScreen> {
     });
   }
 }
+

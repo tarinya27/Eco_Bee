@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "bee_feeder_ui" "\0"
+            VALUE "FileDescription", "new_bee" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "bee_feeder_ui" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2024 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "bee_feeder_ui.exe" "\0"
-            VALUE "ProductName", "bee_feeder_ui" "\0"
+            VALUE "InternalName", "new_bee" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2025 com.example. All rights reserved." "\0"
+            VALUE "OriginalFilename", "new_bee.exe" "\0"
+            VALUE "ProductName", "new_bee" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

@@ -1,6 +1,6 @@
-import 'package:bee_feeder_ui/automation.dart';
-import 'package:bee_feeder_ui/feeding_history.dart';
 import 'package:flutter/material.dart';
+import 'package:new_bee/automation.dart';
+import 'package:new_bee/feeding_history.dart';
 
 void main() => runApp(MyApp());
 
@@ -12,10 +12,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Dashboard(),
-      routes: {
-        '/automation': (context) => AutomationScreen(),
-        '/feeding-history': (context) => FeedingHistoryScreen(),
-      },
     );
   }
 }
@@ -28,7 +24,7 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  String? _selectedLanguage; // Variable to store the selected language
+  String? _selectedLanguage;
 
   @override
   Widget build(BuildContext context) {
@@ -36,35 +32,37 @@ class _DashboardState extends State<Dashboard> {
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         backgroundColor: const Color(0xFFE59C15),
-        title: const Text('DASHBOARD', style: TextStyle(color: Colors.white)),
+        title: const Text('Dashboard', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         actions: const [
-          // Add profile picture in the AppBar
           Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: EdgeInsets.only(right: 12.0),
             child: CircleAvatar(
-              backgroundImage: AssetImage('images/profile.jpg'), // Profile picture
+              radius: 20,
+              backgroundImage: AssetImage('images/profile.jpg'),
             ),
           ),
         ],
+        elevation: 0,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Greeting Text
             const Text(
-              'Hello, Tarinya!',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              'Welcome, Tarinya!',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 20),
 
-            // Language Dropdown Selector
+            // Language Dropdown
             DropdownButtonFormField<String>(
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Select Your Language',
-                border: OutlineInputBorder(),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               ),
               value: _selectedLanguage,
               items: const [
@@ -78,87 +76,94 @@ class _DashboardState extends State<Dashboard> {
               },
             ),
 
-            // Display card with buttons only after a language is selected
-            if (_selectedLanguage != null) ...[
-              const SizedBox(height: 20), // Spacing between elements
+            const SizedBox(height: 20),
 
-              // Container with buttons inside one card
-              Container(
-                height: 250, // Increased card height
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(231, 237, 232, 232),
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.3),
-                      blurRadius: 6,
-                      spreadRadius: 2,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            if (_selectedLanguage != null)
+              Expanded(
+                child: GridView.count(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 16,
+                  childAspectRatio: 1.1,
                   children: [
-                    // Automation Button
-                    ElevatedButton(
-                      onPressed: () {
+                    dashboardCard(
+                      label: 'Automation',
+                      image: 'images/automation.jpg',
+                      onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => AutomationScreen()),
                         );
                       },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.all(16.0),
-                        backgroundColor: const Color(0xFFE59C15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 4,
-                      ),
-                      child: Row(
-                        children: [
-                          Image.asset('images/automation.jpg', height: 50, width: 50),
-                          const SizedBox(width: 10),
-                          const Text(
-                            'Automation',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
-                          ),
-                        ],
-                      ),
                     ),
-
-                    // Feeding History Button
-                    ElevatedButton(
-                      onPressed: () {
+                    dashboardCard(
+                      label: 'Feeding History',
+                      image: 'images/feeding_history.png',
+                      onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => FeedingHistoryScreen()),
                         );
                       },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.all(16.0),
-                        backgroundColor: const Color(0xFFE59C15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 4,
-                      ),
-                      child: Row(
-                        children: [
-                          Image.asset('images/feeding_history.png', height: 50, width: 50),
-                          const SizedBox(width: 10),
-                          const Text(
-                            'Feeding History',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
-                          ),
-                        ],
-                      ),
+                    ),
+                    dashboardCard(
+                      label: 'Units',
+                      image: 'images/units.png',
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Navigate to Units")));
+                      },
+                    ),
+                    dashboardCard(
+                      label: 'Insights',
+                      image: 'images/insights.png',
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Navigate to Insights")));
+                      },
                     ),
                   ],
                 ),
               ),
-            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget dashboardCard({
+    required String label,
+    required String image,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              blurRadius: 6,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(image, height: 60, width: 60, fit: BoxFit.contain),
+            const SizedBox(height: 10),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       ),

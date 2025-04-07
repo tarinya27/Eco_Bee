@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -32,35 +30,6 @@ class _SignupState extends State<Signup> {
   String phoneNumber = '';
   String fullName = '';
   String password = '';
-
-  // Firestore instance
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  Future<void> registerUserToFirestore() async {
-    if (selectedApiaries.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please add at least one apiary.")),
-      );
-      return;
-    }
-
-    try {
-      await _firestore.collection('users').add({
-        'phoneNumber': phoneNumber,
-        'fullName': fullName,
-        'password': password, // In production, ensure you hash the password
-        'apiaries': selectedApiaries,
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("User registered successfully!")),
-      );
-      Navigator.pushNamed(context, '/signIn');
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error registering user: $e")),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -115,6 +84,7 @@ class _SignupState extends State<Signup> {
                 color: Colors.black,
               ),
             ),
+            const Text("Already have an account? Sign In", style: TextStyle(fontSize: 12)),
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: Form(
@@ -123,78 +93,87 @@ class _SignupState extends State<Signup> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Phone Number
-                    TextFormField(
-                      decoration: InputDecoration(
-                        labelText: "Phone Number",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        filled: true,
-                        fillColor: Colors.grey[200],
-                      ),
-                      onSaved: (value) {
-                        phoneNumber = value ?? '';
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Phone Number is required';
-                        }
-                        return null;
-                      },
-                    ),
+                    buildTextField("Phone Number", onSaved: (val) => phoneNumber = val),
                     const SizedBox(height: 15),
+
                     // Full Name
-                    TextFormField(
-                      decoration: InputDecoration(
-                        labelText: "Full Name",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        filled: true,
-                        fillColor: Colors.grey[200],
-                      ),
-                      onSaved: (value) {
-                        fullName = value ?? '';
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Full Name is required';
-                        }
-                        return null;
-                      },
-                    ),
+                    buildTextField("Full Name", onSaved: (val) => fullName = val),
                     const SizedBox(height: 15),
+
                     // Password
-                    TextFormField(
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        labelText: "Password",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        filled: true,
-                        fillColor: Colors.grey[200],
-                      ),
-                      onSaved: (value) {
-                        password = value ?? '';
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Password is required';
-                        }
-                        return null;
+                    buildTextField("Password", obscureText: true, onSaved: (val) => password = val),
+                    const SizedBox(height: 15),
+
+                    // Apiary Province Dropdown
+                    DropdownButtonFormField<String>(
+                      value: selectedApiary,
+                      hint: const Text("Apiary Name (Which Province)"),
+                      decoration: buildDropdownDecoration(),
+                      items: apiaryLocationMap.keys
+                          .map((province) => DropdownMenuItem(
+                                value: province,
+                                child: Text(province),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedApiary = value;
+                          apiaryLocations = apiaryLocationMap[value] ?? [];
+                          selectedLocation = null;
+                        });
                       },
                     ),
                     const SizedBox(height: 15),
-                    // Dropdowns for Apiary and Location
-                    // (Existing code for Apiary Name, Location, and Hives here)
+
+                    // Apiary Location Dropdown
+                    DropdownButtonFormField<String>(
+                      value: selectedLocation,
+                      hint: const Text("Select Apiary Location"),
+                      decoration: buildDropdownDecoration(),
+                      items: apiaryLocations
+                          .map((location) => DropdownMenuItem(
+                                value: location,
+                                child: Text(location),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedLocation = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 15),
+
+                    // Number of Hives Dropdown
+                    DropdownButtonFormField<int>(
+                      value: selectedHives,
+                      hint: const Text("Select No.of Hives"),
+                      decoration: buildDropdownDecoration(),
+                      items: hiveOptions
+                          .map((hive) => DropdownMenuItem(
+                                value: hive,
+                                child: Text(hive.toString()),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedHives = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 25),
+
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
                           if (_formKey.currentState?.validate() ?? false) {
                             _formKey.currentState?.save();
-                            registerUserToFirestore();
+
+                            // You can handle UI-only logic here
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Form submitted (UI only).")),
+                            );
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -214,6 +193,40 @@ class _SignupState extends State<Signup> {
           ],
         ),
       ),
+    );
+  }
+
+  InputDecoration buildDropdownDecoration() {
+    return InputDecoration(
+      filled: true,
+      fillColor: Colors.grey[200],
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide.none,
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+    );
+  }
+
+  Widget buildTextField(String label,
+      {bool obscureText = false, required void Function(String) onSaved}) {
+    return TextFormField(
+      obscureText: obscureText,
+      decoration: InputDecoration(
+        labelText: label,
+        filled: true,
+        fillColor: Colors.grey[200],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+      onSaved: (value) => onSaved(value ?? ''),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return '$label is required';
+        }
+        return null;
+      },
     );
   }
 }

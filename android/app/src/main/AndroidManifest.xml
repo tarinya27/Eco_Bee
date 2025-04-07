@@ -1,7 +1,6 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-         package="com.example.bee_feeder_ui">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="bee_feeder_ui"
+        android:label="new_bee"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
