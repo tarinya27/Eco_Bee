@@ -1,11 +1,12 @@
-import 'package:new_bee/dashboard.dart';
 import 'package:flutter/material.dart';
+
+import 'dashboard.dart';
 
 class AutomationScreen extends StatefulWidget {
   const AutomationScreen({super.key});
 
   @override
-  _AutomationScreenState createState() => _AutomationScreenState();
+  State<AutomationScreen> createState() => _AutomationScreenState();
 }
 
 class _AutomationScreenState extends State<AutomationScreen> {
@@ -31,7 +32,7 @@ class _AutomationScreenState extends State<AutomationScreen> {
     'Central': ['Kandy', 'Nuwara Eliya', 'Matale'],
     'UVA': ['Badulla', 'Moneragala'],
     'North-central': ['Anuradhapura', 'Polonnaruwa'],
-    'Northern': ['Jaffna', 'Mannar', 'Kilinochchi']
+    'Northern': ['Jaffna', 'Mannar', 'Kilinochchi'],
   };
 
   @override
@@ -44,7 +45,9 @@ class _AutomationScreenState extends State<AutomationScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (context) => Dashboard()));
+              context,
+              MaterialPageRoute(builder: (context) => Dashboard()),
+            );
           },
         ),
         actions: [
@@ -95,14 +98,19 @@ class _AutomationScreenState extends State<AutomationScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             DropdownButtonFormField<String>(
-              decoration: const InputDecoration(labelText: 'Select Your Bee Species'),
+              decoration: const InputDecoration(
+                labelText: 'Select Your Bee Species',
+              ),
               value: selectedBeeSpecies,
-              items: ['Apis mellifera', 'Apis cerana']
-                  .map((species) => DropdownMenuItem(
-                        value: species,
-                        child: Text(species),
-                      ))
-                  .toList(),
+              items:
+                  ['Apis mellifera', 'Apis cerana']
+                      .map(
+                        (species) => DropdownMenuItem(
+                          value: species,
+                          child: Text(species),
+                        ),
+                      )
+                      .toList(),
               onChanged: (value) {
                 setState(() {
                   selectedBeeSpecies = value;
@@ -111,33 +119,44 @@ class _AutomationScreenState extends State<AutomationScreen> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              decoration: const InputDecoration(labelText: 'Select the Apiary Name'),
+              decoration: const InputDecoration(
+                labelText: 'Select the Apiary Name',
+              ),
               value: selectedApiaryName,
-              items: apiaryData.keys
-                  .map((apiary) => DropdownMenuItem(
-                        value: apiary,
-                        child: Text(apiary),
-                      ))
-                  .toList(),
+              items:
+                  apiaryData.keys
+                      .map(
+                        (apiary) => DropdownMenuItem(
+                          value: apiary,
+                          child: Text(apiary),
+                        ),
+                      )
+                      .toList(),
               onChanged: (value) {
                 setState(() {
                   selectedApiaryName = value;
-                  selectedApiaryLocation = null; // Reset location when name changes
+                  selectedApiaryLocation =
+                      null; // Reset location when name changes
                 });
               },
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              decoration: const InputDecoration(labelText: 'Select the Apiary Location'),
+              decoration: const InputDecoration(
+                labelText: 'Select the Apiary Location',
+              ),
               value: selectedApiaryLocation,
-              items: selectedApiaryName != null
-                  ? apiaryData[selectedApiaryName]!
-                      .map((location) => DropdownMenuItem(
-                            value: location,
-                            child: Text(location),
-                          ))
-                      .toList()
-                  : [],
+              items:
+                  selectedApiaryName != null
+                      ? apiaryData[selectedApiaryName]!
+                          .map(
+                            (location) => DropdownMenuItem(
+                              value: location,
+                              child: Text(location),
+                            ),
+                          )
+                          .toList()
+                      : [],
               onChanged: (value) {
                 setState(() {
                   selectedApiaryLocation = value;
@@ -148,12 +167,13 @@ class _AutomationScreenState extends State<AutomationScreen> {
             DropdownButtonFormField<String>(
               decoration: const InputDecoration(labelText: 'Select the Hive'),
               value: selectedHive,
-              items: ['Hive 1', 'Hive 2']
-                  .map((hive) => DropdownMenuItem(
-                        value: hive,
-                        child: Text(hive),
-                      ))
-                  .toList(),
+              items:
+                  ['Hive 1', 'Hive 2']
+                      .map(
+                        (hive) =>
+                            DropdownMenuItem(value: hive, child: Text(hive)),
+                      )
+                      .toList(),
               onChanged: (value) {
                 setState(() {
                   selectedHive = value;
@@ -165,29 +185,28 @@ class _AutomationScreenState extends State<AutomationScreen> {
               Center(
                 child: Text(
                   validationMessage!,
-                  style: const TextStyle(
-                    color: Colors.red,
-                    fontSize: 18,
-                  ),
+                  style: const TextStyle(color: Colors.red, fontSize: 18),
                 ),
               ),
             Center(
               child: ElevatedButton(
-                onPressed: (selectedBeeSpecies != null &&
-                        selectedApiaryName != null &&
-                        selectedApiaryLocation != null &&
-                        selectedHive != null)
-                    ? () {
-                        setState(() {
-                          validationMessage = null; // Clear validation message
-                        });
-                        startAutomation(); // Start the automation process
-                      }
-                    : () {
-                        setState(() {
-                          validationMessage = "Please select all fields";
-                        });
-                      },
+                onPressed:
+                    (selectedBeeSpecies != null &&
+                            selectedApiaryName != null &&
+                            selectedApiaryLocation != null &&
+                            selectedHive != null)
+                        ? () {
+                          setState(() {
+                            validationMessage =
+                                null; // Clear validation message
+                          });
+                          startAutomation(); // Start the automation process
+                        }
+                        : () {
+                          setState(() {
+                            validationMessage = "Please select all fields";
+                          });
+                        },
                 child: const Text('Automation On'),
               ),
             ),
@@ -205,19 +224,26 @@ class _AutomationScreenState extends State<AutomationScreen> {
                           width: 150, // Make the rectangle wider
                           height: 300, // Make the rectangle taller
                           decoration: BoxDecoration(
-                            border: Border.all(color: const Color.fromARGB(207, 0, 0, 0)), // Darker border
-                            borderRadius: BorderRadius.circular(8), // Slightly rounded rectangle
+                            border: Border.all(
+                              color: const Color.fromARGB(207, 0, 0, 0),
+                            ), // Darker border
+                            borderRadius: BorderRadius.circular(
+                              8,
+                            ), // Slightly rounded rectangle
                           ),
                           child: Stack(
                             alignment: Alignment.bottomCenter,
                             children: [
                               AnimatedContainer(
                                 duration: const Duration(seconds: 1),
-                                height: progress * 300, // Height based on progress
+                                height: progress * 300,
+                                // Height based on progress
                                 width: 150,
                                 decoration: BoxDecoration(
                                   color: Colors.blue,
-                                  borderRadius: BorderRadius.circular(8), // Keep corners consistent
+                                  borderRadius: BorderRadius.circular(
+                                    8,
+                                  ), // Keep corners consistent
                                 ),
                               ),
                             ],
@@ -225,7 +251,8 @@ class _AutomationScreenState extends State<AutomationScreen> {
                         ),
                         Positioned(
                           right: -30,
-                          top: (1 - progress) * 300 - 10, // Dynamic position of the percentage
+                          top: (1 - progress) * 300 - 10,
+                          // Dynamic position of the percentage
                           child: Text(
                             '${(progress * 100).toInt()}%',
                             style: const TextStyle(
@@ -245,9 +272,10 @@ class _AutomationScreenState extends State<AutomationScreen> {
                             child: Text(
                               'Finished :)',
                               style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFFE59C15)),
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFFE59C15),
+                              ),
                             ),
                           ),
                           Padding(
@@ -255,9 +283,10 @@ class _AutomationScreenState extends State<AutomationScreen> {
                             child: Text(
                               'Feeder is full',
                               style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.normal,
-                                  color: Color.fromARGB(218, 18, 17, 17)),
+                                fontSize: 20,
+                                fontWeight: FontWeight.normal,
+                                color: Color.fromARGB(218, 18, 17, 17),
+                              ),
                             ),
                           ),
                         ],
@@ -293,4 +322,3 @@ class _AutomationScreenState extends State<AutomationScreen> {
     });
   }
 }
-

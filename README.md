@@ -1,6 +1,6 @@
-# new_bee
+# b_project
 
-A new Flutter project.
+Bee monitoring and automations.
 
 ## Getting Started
 

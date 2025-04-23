@@ -1,21 +1,22 @@
 {
   "project_info": {
-    "project_number": "921754525961",
-    "project_id": "bee-feeding",
-    "storage_bucket": "bee-feeding.firebasestorage.app"
+    "project_number": "1021772190140",
+    "firebase_url": "https://bee-feeder-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "bee-feeder",
+    "storage_bucket": "bee-feeder.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:921754525961:android:2a4ac4da63e1efce26f3d8",
+        "mobilesdk_app_id": "1:1021772190140:android:1801aad520b6fef0779bb9",
         "android_client_info": {
-          "package_name": "com.example.bee_feeder"
+          "package_name": "com.tarinya.b_project"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBUw42iV93odHlP899ScFeuOp2bmCP1Nfk"
+          "current_key": "AIzaSyAlvdCHMfCdDD-vw5Vd3NvqJaoWTaUSWh8"
         }
       ],
       "services": {

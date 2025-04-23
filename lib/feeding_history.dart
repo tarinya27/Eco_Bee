@@ -1,33 +1,13 @@
-import 'package:new_bee/automation.dart';
-import 'package:new_bee/dashboard.dart';
-import 'package:new_bee/feeding_history.dart';
 import 'package:flutter/material.dart';
-import 'package:new_bee/signup.dart';
-import 'package:new_bee/signin.dart';
 
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: FeedingHistoryScreen(), 
-    );
-  }
-}
+import 'dashboard.dart';
 
 // Feeding History Screen
 class FeedingHistoryScreen extends StatefulWidget {
   const FeedingHistoryScreen({super.key});
 
   @override
-  _FeedingHistoryScreenState createState() => _FeedingHistoryScreenState();
+  State<FeedingHistoryScreen> createState() => _FeedingHistoryScreenState();
 }
 
 class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
@@ -73,12 +53,15 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
           children: [
             DropdownButtonFormField<String>(
               value: selectedApiaryName,
-              items: apiaryData.keys
-                  .map((apiaryName) => DropdownMenuItem(
-                        value: apiaryName,
-                        child: Text(apiaryName),
-                      ))
-                  .toList(),
+              items:
+                  apiaryData.keys
+                      .map(
+                        (apiaryName) => DropdownMenuItem(
+                          value: apiaryName,
+                          child: Text(apiaryName),
+                        ),
+                      )
+                      .toList(),
               onChanged: (value) {
                 setState(() {
                   selectedApiaryName = value!;
@@ -93,12 +76,15 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
               value: selectedLocation,
-              items: locations
-                  .map((location) => DropdownMenuItem(
-                        value: location,
-                        child: Text(location),
-                      ))
-                  .toList(),
+              items:
+                  locations
+                      .map(
+                        (location) => DropdownMenuItem(
+                          value: location,
+                          child: Text(location),
+                        ),
+                      )
+                      .toList(),
               onChanged: (value) {
                 setState(() {
                   selectedLocation = value!;
@@ -112,12 +98,13 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
               value: selectedHive,
-              items: hives
-                  .map((hive) => DropdownMenuItem(
-                        value: hive,
-                        child: Text(hive),
-                      ))
-                  .toList(),
+              items:
+                  hives
+                      .map(
+                        (hive) =>
+                            DropdownMenuItem(value: hive, child: Text(hive)),
+                      )
+                      .toList(),
               onChanged: (value) {
                 setState(() {
                   selectedHive = value!;
@@ -143,4 +130,3 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
     );
   }
 }
-

@@ -1,13 +1,19 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+
+import 'landing.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
 
   @override
-  _SignupState createState() => _SignupState();
+  State<Signup> createState() => _SignupState();
 }
 
 class _SignupState extends State<Signup> {
+  final _formKey = GlobalKey<FormState>();
+  String fullName = '';
   String? selectedApiary;
   String? selectedLocation;
   int? selectedHives;
@@ -23,13 +29,8 @@ class _SignupState extends State<Signup> {
     'Central': ['Kandy', 'Nuwara Eliya', 'Matale'],
     'UVA': ['Badulla', 'Moneragala'],
     'North-central': ['Anuradhapura', 'Polonnaruwa'],
-    'Northern': ['Jaffna', 'Mannar', 'Kilinochchi']
+    'Northern': ['Jaffna', 'Mannar', 'Kilinochchi'],
   };
-
-  final _formKey = GlobalKey<FormState>();
-  String phoneNumber = '';
-  String fullName = '';
-  String password = '';
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +64,7 @@ class _SignupState extends State<Signup> {
                         backgroundColor: Colors.black,
                         child: ClipOval(
                           child: Image.asset(
-                            'images/ecobee_logo.png',
+                            'images/eco_bee_logo.png',
                             fit: BoxFit.cover,
                             width: 80,
                             height: 80,
@@ -84,7 +85,6 @@ class _SignupState extends State<Signup> {
                 color: Colors.black,
               ),
             ),
-            const Text("Already have an account? Sign In", style: TextStyle(fontSize: 12)),
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: Form(
@@ -92,16 +92,8 @@ class _SignupState extends State<Signup> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Phone Number
-                    buildTextField("Phone Number", onSaved: (val) => phoneNumber = val),
-                    const SizedBox(height: 15),
-
                     // Full Name
-                    buildTextField("Full Name", onSaved: (val) => fullName = val),
-                    const SizedBox(height: 15),
-
-                    // Password
-                    buildTextField("Password", obscureText: true, onSaved: (val) => password = val),
+                    buildTextField("Name", onSaved: (val) => fullName = val),
                     const SizedBox(height: 15),
 
                     // Apiary Province Dropdown
@@ -109,12 +101,15 @@ class _SignupState extends State<Signup> {
                       value: selectedApiary,
                       hint: const Text("Apiary Name (Which Province)"),
                       decoration: buildDropdownDecoration(),
-                      items: apiaryLocationMap.keys
-                          .map((province) => DropdownMenuItem(
-                                value: province,
-                                child: Text(province),
-                              ))
-                          .toList(),
+                      items:
+                          apiaryLocationMap.keys
+                              .map(
+                                (province) => DropdownMenuItem(
+                                  value: province,
+                                  child: Text(province),
+                                ),
+                              )
+                              .toList(),
                       onChanged: (value) {
                         setState(() {
                           selectedApiary = value;
@@ -130,12 +125,15 @@ class _SignupState extends State<Signup> {
                       value: selectedLocation,
                       hint: const Text("Select Apiary Location"),
                       decoration: buildDropdownDecoration(),
-                      items: apiaryLocations
-                          .map((location) => DropdownMenuItem(
-                                value: location,
-                                child: Text(location),
-                              ))
-                          .toList(),
+                      items:
+                          apiaryLocations
+                              .map(
+                                (location) => DropdownMenuItem(
+                                  value: location,
+                                  child: Text(location),
+                                ),
+                              )
+                              .toList(),
                       onChanged: (value) {
                         setState(() {
                           selectedLocation = value;
@@ -149,12 +147,15 @@ class _SignupState extends State<Signup> {
                       value: selectedHives,
                       hint: const Text("Select No.of Hives"),
                       decoration: buildDropdownDecoration(),
-                      items: hiveOptions
-                          .map((hive) => DropdownMenuItem(
-                                value: hive,
-                                child: Text(hive.toString()),
-                              ))
-                          .toList(),
+                      items:
+                          hiveOptions
+                              .map(
+                                (hive) => DropdownMenuItem(
+                                  value: hive,
+                                  child: Text(hive.toString()),
+                                ),
+                              )
+                              .toList(),
                       onChanged: (value) {
                         setState(() {
                           selectedHives = value;
@@ -166,13 +167,53 @@ class _SignupState extends State<Signup> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if (_formKey.currentState?.validate() ?? false) {
                             _formKey.currentState?.save();
+                            try {
+                              User? user = FirebaseAuth.instance.currentUser;
 
-                            // You can handle UI-only logic here
+                              if (user == null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text("User not found!"),
+                                  ),
+                                );
+                              }
+
+                              await user?.updateDisplayName(fullName);
+                              await user?.updatePhotoURL(
+                                "https://ui-avatars.com/api/?background=FFF&color=A94064&size=128&name=${fullName.replaceAll(' ', '+')}",
+                              );
+
+                              await FirebaseDatabase.instance
+                                  .ref('/users/${user?.uid}')
+                                  .set({
+                                    'fullName': fullName,
+                                    'apiary': selectedApiary,
+                                    'location': selectedLocation,
+                                    'hives': selectedHives,
+                                  });
+
+                              if (!context.mounted) return;
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => landing(),
+                                ),
+                              );
+                            } catch (e) {
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("Error: $e")),
+                              );
+                            }
+
+                            if (!context.mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("Form submitted (UI only).")),
+                              const SnackBar(
+                                content: Text("Sign Up Successful!"),
+                              ),
                             );
                           }
                         },
@@ -183,7 +224,10 @@ class _SignupState extends State<Signup> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: const Text("Sign Up", style: TextStyle(fontSize: 18)),
+                        child: const Text(
+                          "Sign Up",
+                          style: TextStyle(fontSize: 18),
+                        ),
                       ),
                     ),
                   ],
@@ -208,17 +252,18 @@ class _SignupState extends State<Signup> {
     );
   }
 
-  Widget buildTextField(String label,
-      {bool obscureText = false, required void Function(String) onSaved}) {
+  Widget buildTextField(
+    String label, {
+    bool obscureText = false,
+    required void Function(String) onSaved,
+  }) {
     return TextFormField(
       obscureText: obscureText,
       decoration: InputDecoration(
         labelText: label,
         filled: true,
         fillColor: Colors.grey[200],
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
       ),
       onSaved: (value) => onSaved(value ?? ''),
       validator: (value) {

@@ -1,26 +1,17 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:new_bee/automation.dart';
-import 'package:new_bee/feeding_history.dart';
 
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Dashboard(),
-    );
-  }
-}
+import 'automation.dart';
+import 'feeding_history.dart';
+import 'insights.dart';
+import 'unit.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
 
   @override
-  _DashboardState createState() => _DashboardState();
+  State<Dashboard> createState() => _DashboardState();
 }
 
 class _DashboardState extends State<Dashboard> {
@@ -50,9 +41,30 @@ class _DashboardState extends State<Dashboard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Welcome, Tarinya!',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+            StreamBuilder<DatabaseEvent>(
+              stream:
+                  FirebaseDatabase.instance
+                      .ref('users/${FirebaseAuth.instance.currentUser?.uid}')
+                      .onValue,
+              builder: (context, snapshot) {
+                String name;
+                if (!snapshot.hasData) {
+                  name = 'User';
+                } else {
+                  final userData =
+                      snapshot.data?.snapshot.value as Map<dynamic, dynamic>?;
+                  name = userData?['fullName'] ?? 'User';
+                }
+
+                return Text(
+                  'Welcome, $name!',
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 20),
 
@@ -62,7 +74,9 @@ class _DashboardState extends State<Dashboard> {
                 labelText: 'Select Your Language',
                 filled: true,
                 fillColor: Colors.white,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               value: _selectedLanguage,
               items: const [
@@ -92,7 +106,9 @@ class _DashboardState extends State<Dashboard> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => AutomationScreen()),
+                          MaterialPageRoute(
+                            builder: (context) => AutomationScreen(),
+                          ),
                         );
                       },
                     ),
@@ -102,7 +118,9 @@ class _DashboardState extends State<Dashboard> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => FeedingHistoryScreen()),
+                          MaterialPageRoute(
+                            builder: (context) => FeedingHistoryScreen(),
+                          ),
                         );
                       },
                     ),
@@ -110,14 +128,24 @@ class _DashboardState extends State<Dashboard> {
                       label: 'Units',
                       image: 'images/units.png',
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Navigate to Units")));
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => HoneyUnitListScreen(),
+                          ),
+                        );
                       },
                     ),
                     dashboardCard(
                       label: 'Insights',
                       image: 'images/insights.png',
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Navigate to Insights")));
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Insights(units: []),
+                          ),
+                        );
                       },
                     ),
                   ],
@@ -144,7 +172,7 @@ class _DashboardState extends State<Dashboard> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
+              color: Colors.grey.withValues(alpha: 0.2),
               blurRadius: 6,
               offset: Offset(0, 4),
             ),
