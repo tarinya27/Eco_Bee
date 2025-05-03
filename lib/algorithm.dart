@@ -1,5 +1,4 @@
 (String, double) assessFeeding({
-  required double hiveTemp,
   required double hiveHumidity,
   required double externalTemp,
   required bool raining,
@@ -9,8 +8,6 @@
   required String hiveSize,
   (DateTime, double)? lastFeeding,
 }) {
-  const double optimalHiveTempMin = 32.0;
-  const double optimalHiveTempMax = 35.0;
   const double optimalHiveHumidityMin = 50.0;
   const double optimalHiveHumidityMax = 60.0;
   const double minForagingTemp = 10.0;
@@ -20,8 +17,7 @@
   bool poorForagingConditions = raining || externalTemp < minForagingTemp;
 
   // Evaluate hive conditions
-  bool suboptimalHiveConditions = hiveTemp < optimalHiveTempMin ||
-      hiveTemp > optimalHiveTempMax ||
+  bool suboptimalHiveConditions =
       hiveHumidity < optimalHiveHumidityMin ||
       hiveHumidity > optimalHiveHumidityMax;
 
@@ -60,18 +56,25 @@
     var (lastFeedingTime, _) = lastFeeding;
     Duration timeSinceLastFeeding = currentTime.difference(lastFeedingTime);
     if (timeSinceLastFeeding.inHours < feedingIntervalHours) {
-      return ('No feeding necessary at this time; previous feeding was recent.', 0.0);
+      return (
+        'No feeding necessary at this time; previous feeding was recent.',
+        0.0,
+      );
     }
   }
 
   // Calculate feeding necessity and quantity
-  if (poorForagingConditions || suboptimalHiveConditions ||
+  if (poorForagingConditions ||
+      suboptimalHiveConditions ||
       isNectarScarceSeason) {
-    double baseFeedAmount = 1000.0; // in milliliters
-    double feedQuantity = baseFeedAmount * hiveSizeFactor * speciesFactor *
-        (numFrames / 10.0);
+    double baseFeedAmount = 60.0; // in milliliters
+    double feedQuantity =
+        baseFeedAmount * hiveSizeFactor * speciesFactor * (numFrames / 10.0);
 
-    return ('Feed the bees with $feedQuantity liters of sugar syrup.', feedQuantity);
+    return (
+      'Feed the bees with ${feedQuantity}ml of sugar syrup.',
+      feedQuantity,
+    );
   } else {
     return ('No feeding necessary at this time.', 0.0);
   }

@@ -14,23 +14,7 @@ class Signup extends StatefulWidget {
 class _SignupState extends State<Signup> {
   final _formKey = GlobalKey<FormState>();
   String fullName = '';
-  String? selectedApiary;
-  String? selectedLocation;
-  int? selectedHives;
-  List<String> apiaryLocations = [];
-  List<int> hiveOptions = [1, 2, 3];
-  List<Map<String, dynamic>> selectedApiaries = [];
-
-  Map<String, List<String>> apiaryLocationMap = {
-    'Western': ['Colombo', 'Gampaha', 'Kalutara'],
-    'Southern': ['Galle', 'Matara', 'Hambantota'],
-    'North-western': ['Kurunegala', 'Puttalam', 'Negombo'],
-    'Sabaragamuwa': ['Ratnapura', 'Kegalle'],
-    'Central': ['Kandy', 'Nuwara Eliya', 'Matale'],
-    'UVA': ['Badulla', 'Moneragala'],
-    'North-central': ['Anuradhapura', 'Polonnaruwa'],
-    'Northern': ['Jaffna', 'Mannar', 'Kilinochchi'],
-  };
+  String? language;
 
   @override
   Widget build(BuildContext context) {
@@ -93,72 +77,28 @@ class _SignupState extends State<Signup> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Full Name
-                    buildTextField("Name", onSaved: (val) => fullName = val),
-                    const SizedBox(height: 15),
-
-                    // Apiary Province Dropdown
-                    DropdownButtonFormField<String>(
-                      value: selectedApiary,
-                      hint: const Text("Apiary Name (Which Province)"),
-                      decoration: buildDropdownDecoration(),
-                      items:
-                          apiaryLocationMap.keys
-                              .map(
-                                (province) => DropdownMenuItem(
-                                  value: province,
-                                  child: Text(province),
-                                ),
-                              )
-                              .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedApiary = value;
-                          apiaryLocations = apiaryLocationMap[value] ?? [];
-                          selectedLocation = null;
-                        });
-                      },
+                    buildTextField(
+                      "Full Name",
+                      onSaved: (val) => fullName = val,
                     ),
                     const SizedBox(height: 15),
-
-                    // Apiary Location Dropdown
+                    // Language Selection
                     DropdownButtonFormField<String>(
-                      value: selectedLocation,
-                      hint: const Text("Select Apiary Location"),
                       decoration: buildDropdownDecoration(),
-                      items:
-                          apiaryLocations
-                              .map(
-                                (location) => DropdownMenuItem(
-                                  value: location,
-                                  child: Text(location),
-                                ),
-                              )
-                              .toList(),
+                      hint: const Text("Select the display language."),
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'English',
+                          child: Text('English'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Sinhala',
+                          child: Text('Sinhala'),
+                        ),
+                      ],
                       onChanged: (value) {
                         setState(() {
-                          selectedLocation = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 15),
-
-                    // Number of Hives Dropdown
-                    DropdownButtonFormField<int>(
-                      value: selectedHives,
-                      hint: const Text("Select No.of Hives"),
-                      decoration: buildDropdownDecoration(),
-                      items:
-                          hiveOptions
-                              .map(
-                                (hive) => DropdownMenuItem(
-                                  value: hive,
-                                  child: Text(hive.toString()),
-                                ),
-                              )
-                              .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedHives = value;
+                          language = value;
                         });
                       },
                     ),
@@ -190,9 +130,7 @@ class _SignupState extends State<Signup> {
                                   .ref('/users/${user?.uid}')
                                   .set({
                                     'fullName': fullName,
-                                    'apiary': selectedApiary,
-                                    'location': selectedLocation,
-                                    'hives': selectedHives,
+                                    'language': language,
                                   });
 
                               if (!context.mounted) return;

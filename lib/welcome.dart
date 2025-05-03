@@ -35,7 +35,8 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                // Log In Button
+                const SizedBox(height: 50), // Spacing between logo and buttons
+                // Sign In Button
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(

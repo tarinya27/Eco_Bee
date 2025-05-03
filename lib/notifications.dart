@@ -1,6 +1,8 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'feed.dart';
+import 'unit.dart';
 
 const notificationChannelId = 'bee_feeder_channel';
 
@@ -12,15 +14,16 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 @pragma('vm:entry-point')
 Future<void> onNotificationTap(NotificationResponse response) async {
   print("Notification tapped: ${response.payload}");
+
+  await Firebase.initializeApp();
+
   if (response.payload != null) {
-    if (response.payload == 'manual') {
-      sendFeedingCommand('manual', 30);
-    } else {
-      double quantity = double.tryParse(response.payload!) ?? 0;
+    List<String> payloadParts = response.payload!.split(',');
+    if (payloadParts.length == 2) {
+      String id = payloadParts[0];
+      double quantity = double.tryParse(payloadParts[1]) ?? 0.0;
       if (quantity > 0) {
-        sendFeedingCommand('auto', quantity);
-      } else {
-        print("Invalid quantity received: ${response.payload}");
+        sendFeedingCommand(id, 'auto', quantity);
       }
     }
   }
@@ -57,21 +60,16 @@ const AndroidNotificationDetails androidPlatformChannelSpecifics =
       showWhen: false,
     );
 
-Future<void> showFeedingNotification(double quantity) async {
+Future<void> showFeedingNotification(Unit unit, double quantity) async {
   const NotificationDetails platformChannelSpecifics = NotificationDetails(
     android: androidPlatformChannelSpecifics,
   );
 
   await flutterLocalNotificationsPlugin.show(
     notificationId,
-    'Bee Feeding Alert',
-    'It is time to feed the bees with $quantity ml of sugar syrup.',
+    'Bee Feeding Alert: ${unit.nickname}',
+    'It is time to feed the bees with $quantity ml of sugar syrup. Tap to start the automation',
     platformChannelSpecifics,
-    payload: quantity.toString(),
+    payload: '${unit.id},$quantity',
   );
-}
-
-Future<bool> checkAndNotify() async {
-  await showFeedingNotification(30);
-  return true;
 }

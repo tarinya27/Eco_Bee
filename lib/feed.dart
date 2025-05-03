@@ -1,6 +1,10 @@
 import 'package:firebase_database/firebase_database.dart';
 
-Future<void> sendFeedingCommand(String feedingType, double quantity) async {
+Future<void> sendFeedingCommand(
+  String unitId,
+  String feedingType,
+  double quantity,
+) async {
   if (feedingType != "auto" && feedingType != "manual") {
     throw ArgumentError("Feeding type must be either 'auto' or 'manual'");
   }
@@ -12,7 +16,7 @@ Future<void> sendFeedingCommand(String feedingType, double quantity) async {
         DateTime.now().millisecondsSinceEpoch ~/ 1000, // UNIX timestamp
   };
 
-  final DatabaseReference ref = FirebaseDatabase.instance.ref("pump/unit_1");
+  final DatabaseReference ref = FirebaseDatabase.instance.ref("pump/$unitId");
 
   await ref.set(command);
 

@@ -150,6 +150,8 @@ class _LoginState extends State<Login> {
                                 const SnackBar(content: Text('OTP sent!')),
                               );
                               setState(() {
+                                isOtpSent = true;
+                                shouldOtpResend = false;
                                 this.verificationId = verificationId;
                               });
                             },
@@ -161,10 +163,6 @@ class _LoginState extends State<Login> {
                               });
                             },
                           );
-                          setState(() {
-                            isOtpSent = true;
-                            shouldOtpResend = false;
-                          });
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFFE59C15),
@@ -176,7 +174,7 @@ class _LoginState extends State<Login> {
                         ),
                         child: Text(
                           isOtpSent ? "Resend OTP" : "Send OTP",
-                          style: TextStyle(fontSize: 16),
+                          style: TextStyle(fontSize: 16, color: Colors.white),
                         ),
                       ),
                     ),
@@ -271,7 +269,7 @@ class _LoginState extends State<Login> {
                         ),
                         child: const Text(
                           "Log In",
-                          style: TextStyle(fontSize: 16),
+                          style: TextStyle(fontSize: 16, color: Colors.white),
                         ),
                       ),
                     ),

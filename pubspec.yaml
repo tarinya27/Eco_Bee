@@ -14,6 +14,7 @@ dependencies:
   firebase_core: ^3.13.0
   firebase_auth: ^5.5.2
   flutter_launcher_icons: ^0.14.3
+  intl: ^0.20.2
   fl_chart: ^0.70.2
   google_fonts: ^6.2.1
   firebase_database: ^11.3.5
@@ -34,6 +35,7 @@ flutter:
     - images/profile.jpg
     - images/insights.png
     - images/units.png
+    - images/production.jpg
 
 flutter_launcher_icons:
   android: "launcher_icon"

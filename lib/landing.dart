@@ -3,8 +3,8 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 import 'dashboard.dart';
-import 'login.dart';
 import 'signup.dart';
+import 'welcome.dart';
 
 Widget landing() {
   return StreamBuilder<User?>(
@@ -22,7 +22,7 @@ Widget landing() {
                   .onValue,
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
-              return CircularProgressIndicator();
+              return Center(child: CircularProgressIndicator());
             } else {
               final userData =
                   snapshot.data?.snapshot.value as Map<dynamic, dynamic>?;
@@ -35,7 +35,7 @@ Widget landing() {
           },
         );
       } else {
-        return Login();
+        return WelcomeScreen();
       }
     },
   );
