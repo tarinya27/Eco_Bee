@@ -27,6 +27,7 @@ class _AutomationScreenState extends State<AutomationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Listen to user data stream from Firebase
     return StreamBuilder<DatabaseEvent>(
       stream:
           FirebaseDatabase.instance
@@ -39,11 +40,11 @@ class _AutomationScreenState extends State<AutomationScreen> {
         if (snapshot.hasError) {
           return const Center(child: Text(Localization.errorLoadingData));
         }
-        if (!snapshot.hasData || snapshot.data?.snapshot.value == null) {
+        if (!snapshot.hasData || snapshot.data?.snapshot.value == null) { // Show message if no user data
           return const Center(child: Text(Localization.noUserDataAvailable));
         }
         final userData =
-            snapshot.data?.snapshot.value as Map<dynamic, dynamic>?;
+            snapshot.data?.snapshot.value as Map<dynamic, dynamic>?;  // Extract user data
 
         Localization localization = englishLocalization;
         if (userData?['language'] == 'Sinhala') {
@@ -57,7 +58,7 @@ class _AutomationScreenState extends State<AutomationScreen> {
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.pop(context); // Navigate back
               },
             ),
             actions: [
@@ -65,6 +66,8 @@ class _AutomationScreenState extends State<AutomationScreen> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.notifications),
+
+                    // Show notification bottom sheet
                     onPressed: () {
                       showModalBottomSheet(
                         context: context,
@@ -87,6 +90,7 @@ class _AutomationScreenState extends State<AutomationScreen> {
                       });
                     },
                   ),
+                     // Red dot for new notifications
                   if (hasNotifications)
                     Positioned(
                       right: 11,
@@ -109,6 +113,7 @@ class _AutomationScreenState extends State<AutomationScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Fetch and display units owned by the user
                 StreamBuilder(
                   stream:
                       FirebaseDatabase.instance
@@ -122,6 +127,7 @@ class _AutomationScreenState extends State<AutomationScreen> {
                     }
                     final unitsData =
                         snapshot.data?.snapshot.value as Map<dynamic, dynamic>?;
+                    // Map units from Firebase to local Unit objects
                     final List<Unit> units =
                         unitsData != null
                             ? unitsData.entries
@@ -138,7 +144,7 @@ class _AutomationScreenState extends State<AutomationScreen> {
                                 )
                                 .toList()
                             : [];
-                    if (units.isEmpty) {
+                    if (units.isEmpty) {    // Show message if no units
                       return Center(
                         child: Text(
                           localization.noUnitsFound,
@@ -146,6 +152,7 @@ class _AutomationScreenState extends State<AutomationScreen> {
                         ),
                       );
                     }
+                     // Unit selection dropdown
                     return DropdownButtonFormField<Unit>(
                       decoration: InputDecoration(
                         labelText: localization.selectTheUnit,
@@ -169,6 +176,7 @@ class _AutomationScreenState extends State<AutomationScreen> {
                   },
                 ),
                 const SizedBox(height: 32),
+                 // Display validation or error message
                 if (validationMessage != null)
                   Center(
                     child: Text(
@@ -177,6 +185,7 @@ class _AutomationScreenState extends State<AutomationScreen> {
                       textAlign: TextAlign.center,
                     ),
                   ),
+                // Start automation button
                 Center(
                   child: ElevatedButton(
                     onPressed:
@@ -208,10 +217,11 @@ class _AutomationScreenState extends State<AutomationScreen> {
     );
   }
 
+  // Main logic for triggering automation
   Future<void> startAutomation(Unit unit, Localization localization) async {
     final id = unit.id;
     dynamic record;
-    // get the last pushed obj from data/{id}
+    // Get latest sensor data
     final dataSnapshot =
         await FirebaseDatabase.instance
             .ref('data/$id')
@@ -219,14 +229,17 @@ class _AutomationScreenState extends State<AutomationScreen> {
             .limitToLast(1)
             .once();
     record = dataSnapshot.snapshot.value;
+    // Check for missing data
     if (record == null) {
       setState(() {
         validationMessage = localization.noDataAvailable;
       });
       return;
     }
+    // Extract sensor data
     Map data = record.values.first as Map;
-
+ 
+    // Get last feeding history
     final historySnapshot =
         await FirebaseDatabase.instance
             .ref('history/$id')
@@ -243,6 +256,7 @@ class _AutomationScreenState extends State<AutomationScreen> {
       );
     }
 
+      // Assess feeding need
     (String, double) feed = assessFeeding(
       hiveHumidity: data['humidity'],
       externalTemp: data['temperature'],
@@ -253,11 +267,14 @@ class _AutomationScreenState extends State<AutomationScreen> {
       hiveSize: unit.hiveSize,
       lastFeeding: lastFeeding,
     );
+
+    // If feeding not required, show reason
     if (feed.$2 == 0) {
       setState(() {
         validationMessage = feed.$1;
       });
     } else {
+      // Otherwise, send command to feeder
       sendFeedingCommand(id, 'manual', feed.$2);
     }
   }

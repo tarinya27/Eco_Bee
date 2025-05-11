@@ -16,17 +16,20 @@ class FeedingHistoryScreen extends StatefulWidget {
   State<FeedingHistoryScreen> createState() => _FeedingHistoryScreenState();
 }
 
+// Feeding History Screen displaying last 6 months' feeding data
 class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
   Unit? selectedUnit;
-  Map<String, double> monthlySums = {};
+  Map<String, double> monthlySums = {}; // Monthly feed quantities
   bool loadingHistory = false;
-
+  
+  // Function to load feeding history for the selected unit
   void loadHistory() async {
     if (selectedUnit == null) return;
     setState(() {
       loadingHistory = true;
     });
-
+   
+   //Get feeding history data from Firebase, sorted by timestamp
     final snapshot =
         await FirebaseDatabase.instance
             .ref('history/${selectedUnit!.id}')
@@ -46,6 +49,7 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
           final timestamp = data['timestamp'];
           final quantity = data['quantity'];
 
+          // Filter data within last 6 months
           if (timestamp != null && quantity != null) {
             DateTime date = DateTime.fromMillisecondsSinceEpoch(
               (timestamp as num).toInt() * 1000,
@@ -61,12 +65,14 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
         }
       }
     }
-
+    
+    //Generate keys for last 6 months to keep ordering consistent
     List<String> last6Months = List.generate(6, (i) {
       DateTime d = DateTime(now.year, now.month - (5 - i));
       return DateFormat('MMM yyyy').format(d);
     });
-
+    
+    //Update UI with fetched data
     setState(() {
       monthlySums = {for (var month in last6Months) month: sums[month] ?? 0.0};
       loadingHistory = false;
@@ -75,6 +81,7 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //Get user data stream to fetch language preference
     return StreamBuilder<DatabaseEvent>(
       stream:
           FirebaseDatabase.instance
@@ -116,6 +123,7 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // unit selection dropdown
                 StreamBuilder(
                   stream:
                       FirebaseDatabase.instance
@@ -172,12 +180,13 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
                           selectedUnit = value;
                           monthlySums = {};
                         });
-                        loadHistory();
+                        loadHistory(); // Load chart data after unit change
                       },
                     );
                   },
                 ),
                 const SizedBox(height: 32),
+                // Display loading bar chart
                 Expanded(
                   child:
                       loadingHistory
@@ -202,6 +211,7 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
     );
   }
 
+  // Build the bar chart using the monthly sums
   Widget buildBarChart() {
     final spots = monthlySums.entries.toList();
 
@@ -230,7 +240,7 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
                   return SideTitleWidget(
                     meta: meta,
                     child: Text(
-                      spots[index].key.split(' ')[0],
+                      spots[index].key.split(' ')[0], //display month only
                       style: const TextStyle(fontSize: 10),
                     ),
                   );
@@ -260,6 +270,8 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
         ),
         gridData: FlGridData(show: true),
         borderData: FlBorderData(show: false),
+
+        //generate bar groups from the data
         barGroups: List.generate(spots.length, (index) {
           return BarChartGroupData(
             x: index,

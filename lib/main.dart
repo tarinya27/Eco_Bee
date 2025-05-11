@@ -1,10 +1,12 @@
 import 'package:background_fetch/background_fetch.dart';
+import 'package:eco_bee/login.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'background.dart';
 import 'landing.dart';
 import 'notifications.dart';
+import 'package:eco_bee/signup.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +26,9 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(debugShowCheckedModeBanner: false, home: landing());
+    return MaterialApp(debugShowCheckedModeBanner: false, 
+    home: Login());
+    //home:Signup();
   }
 
   @override
