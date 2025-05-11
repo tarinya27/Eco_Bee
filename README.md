@@ -1,4 +1,4 @@
-# b_project
+# Smart Automation & Data-Driven Insights for Enhance Colony Health & Productivity
 
 Bee monitoring and automations.
 
