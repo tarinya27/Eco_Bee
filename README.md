@@ -2,7 +2,7 @@
 
 ##🚀   Main Functionalities 
 
-🤖 **Automation** – Manage feeder automation
+🤖 **Automation** – Manage feeder automation <br>
 📦 **Feeding History** – Track monthly feeding history 
 📊 **Data-Driven Insights** - Visualizes trends among feeding history and honey yield per hive
 🍯 **Honey Production** - Can keep track of harvest honey yield 
@@ -25,8 +25,10 @@
    git clone https://github.com/yourusername/your-repo.git
    cd your-repo
 2. Install dependencies
+    ```bash
    flutter pub get
-3. Run the App
+4. Run the App
+   ```bash
    flutter run
 
 
