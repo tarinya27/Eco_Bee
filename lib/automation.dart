@@ -19,12 +19,6 @@ class _AutomationScreenState extends State<AutomationScreen> {
   bool hasNotifications = true; // Simulating notifications
   String? validationMessage; // Validation message
 
-  final List<String> notifications = [
-    "Notification 1: Colombo hive 1 feeder is empty",
-    "Notification 2: Galle hive 2 automation started",
-    "Notification 3: automation finished",
-  ];
-
   @override
   Widget build(BuildContext context) {
     // Listen to user data stream from Firebase
@@ -61,52 +55,6 @@ class _AutomationScreenState extends State<AutomationScreen> {
                 Navigator.pop(context); // Navigate back
               },
             ),
-            actions: [
-              Stack(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.notifications),
-
-                    // Show notification bottom sheet
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return ListView.builder(
-                            itemCount: notifications.length,
-                            itemBuilder: (context, index) {
-                              return ListTile(
-                                leading: const Icon(
-                                  Icons.notification_important,
-                                ),
-                                title: Text(notifications[index]),
-                              );
-                            },
-                          );
-                        },
-                      );
-                      setState(() {
-                        hasNotifications = false; // Clear notifications
-                      });
-                    },
-                  ),
-                     // Red dot for new notifications
-                  if (hasNotifications)
-                    Positioned(
-                      right: 11,
-                      top: 11,
-                      child: Container(
-                        height: 10,
-                        width: 10,
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ],
           ),
           body: Padding(
             padding: const EdgeInsets.all(16.0),

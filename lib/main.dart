@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'background.dart';
 import 'landing.dart';
 import 'notifications.dart';
-import 'package:eco_bee/signup.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,7 +28,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(debugShowCheckedModeBanner: false, 
     home: Login());
-    //home:Signup();
+
   }
 
   @override
