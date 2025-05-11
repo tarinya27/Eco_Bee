@@ -3,19 +3,19 @@
 ##🚀   Main Functionalities 
 
 🤖 **Automation** – Manage feeder automation <br>
-📦 **Feeding History** – Track monthly feeding history 
-📊 **Data-Driven Insights** - Visualizes trends among feeding history and honey yield per hive
-🍯 **Honey Production** - Can keep track of harvest honey yield 
-🔔 **Notifications** – Get alerts on system activity
-🔐 **Authentication** – Secure login and sign-up
-🌐 **Localization** – Multilingual support
+📦 **Feeding History** – Track monthly feeding history <br>
+📊 **Data-Driven Insights** - Visualizes trends among feeding history and honey yield per hive<br>
+🍯 **Honey Production** - Can keep track of harvest honey yield <br>
+🔔 **Notifications** – Get alerts on system activity<br>
+🔐 **Authentication** – Secure login and sign-up<br>
+🌐 **Localization** – Multilingual support<br>
 ☁️ **Firebase Integration** – Backend with Firebase
 
 ## 🛠️ Tech Stack
 
-🎯 Dart & Flutter
-🔥 Firebase (Auth, Firestore, etc.)
-📱 Responsive UI
+🎯 Dart & Flutter <br>
+🔥 Firebase (Auth, Firestore, etc.) <br>
+📱 Responsive UI <br>
 🌍 Multi-language support
   
 ## 🧪 How to Run
