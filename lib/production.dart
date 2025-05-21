@@ -18,6 +18,7 @@ class Production {
     required this.timestamp,
   });
 
+  // Equality operator to compare Production objects by id
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -26,6 +27,7 @@ class Production {
   @override
   int get hashCode => id.hashCode;
 
+  // String representation for debugging
   @override
   String toString() => 'Production(id: $id, quantity: $quantity)';
 }
@@ -36,6 +38,7 @@ class ProductionScreen extends StatefulWidget {
   State<ProductionScreen> createState() => _ProductionScreenState();
 }
 
+ // Currently selected bee unit
 class _ProductionScreenState extends State<ProductionScreen> {
   Unit? unit;
 
@@ -44,28 +47,31 @@ class _ProductionScreenState extends State<ProductionScreen> {
     try {
       final recordRef =
           FirebaseDatabase.instance.ref('production/${production.id}').push();
+      // Save quantity and timestamp 
       await recordRef.set({
         'quantity': production.quantity,
         'timestamp': production.timestamp.toIso8601String(),
       });
+       // Show success message if widget is still mounted
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Production record added successfully!')),
         );
       }
     } catch (error) {
+       // Show error message if saving fails
       _showError(error);
     }
   }
 
-  /// Shows error message
+  /// Shows error message using snackkbar
   void _showError(Object error) {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text('Error: $error')));
   }
 
-  /// Opens form to add production
+ /// Opens the form screen to add a production record
   void _openAddProductionForm(BuildContext context, Localization localization) {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -118,6 +124,7 @@ class _ProductionScreenState extends State<ProductionScreen> {
             ),
             subtitle: Padding(
               padding: const EdgeInsets.only(top: 6),
+               // Show formatted date/time of production record
               child: Text('📅 ${production.timestamp.toLocal()}'),
             ),
           ),
@@ -137,15 +144,19 @@ class _ProductionScreenState extends State<ProductionScreen> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
+        // Show error if data load fails
         if (snapshot.hasError) {
           return const Center(child: Text(Localization.errorLoadingData));
         }
+        // Show message if no user data found
         if (!snapshot.hasData || snapshot.data?.snapshot.value == null) {
           return const Center(child: Text(Localization.noUserDataAvailable));
         }
+        // Extract user data
         final userData =
             snapshot.data?.snapshot.value as Map<dynamic, dynamic>?;
 
+        // Set localization based on user language preference
         Localization localization = englishLocalization;
         if (userData?['language'] == 'Sinhala') {
           localization = sinhalaLocalization;
@@ -167,6 +178,7 @@ class _ProductionScreenState extends State<ProductionScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 StreamBuilder(
+                  // StreamBuilder to load user's bee units
                   stream:
                       FirebaseDatabase.instance
                           .ref('units')
@@ -177,6 +189,7 @@ class _ProductionScreenState extends State<ProductionScreen> {
                     if (!snapshot.hasData) {
                       return const Center(child: CircularProgressIndicator());
                     }
+                    // Parse units from Firebase data
                     final unitsData =
                         snapshot.data?.snapshot.value as Map<dynamic, dynamic>?;
                     final List<Unit> units =
@@ -195,6 +208,7 @@ class _ProductionScreenState extends State<ProductionScreen> {
                                 )
                                 .toList()
                             : [];
+                    // Show message if no units found
                     if (units.isEmpty) {
                       return const Center(
                         child: Text(
@@ -203,6 +217,7 @@ class _ProductionScreenState extends State<ProductionScreen> {
                         ),
                       );
                     }
+                    // Dropdown to select one of the user's units
                     return DropdownButtonFormField<Unit>(
                       decoration: InputDecoration(
                         labelText: localization.selectTheUnit,
@@ -226,6 +241,7 @@ class _ProductionScreenState extends State<ProductionScreen> {
                   },
                 ),
                 const SizedBox(height: 20),
+                // Display production records if unit selected; else show message
                 Expanded(
                   child:
                       unit == null
@@ -286,6 +302,7 @@ class _ProductionScreenState extends State<ProductionScreen> {
                                           )
                                           .toList()
                                       : [];
+                              // Build the list view of production records
                               return _buildProductionList(
                                 productions,
                                 localization,
@@ -296,6 +313,7 @@ class _ProductionScreenState extends State<ProductionScreen> {
               ],
             ),
           ),
+          // Floating button to add new production record
           floatingActionButton: Padding(
             padding: const EdgeInsets.only(bottom: 30.0),
             child: FloatingActionButton(
@@ -312,8 +330,8 @@ class _ProductionScreenState extends State<ProductionScreen> {
 
 /// Form screen for adding a production record
 class AddProductionForm extends StatefulWidget {
-  final Unit? unit;
-  final Function(Production) onSave;
+  final Unit? unit; // The unit for which production is added
+  final Function(Production) onSave; // Callback to save the production record
   final Localization localization;
 
   AddProductionForm({
@@ -329,10 +347,12 @@ class AddProductionForm extends StatefulWidget {
 class _AddProductionFormState extends State<AddProductionForm> {
   final _quantityController = TextEditingController(text: '0.0');
 
+/// Save the production record after validation
   void _saveForm() {
     final id = widget.unit?.id;
     final quantity = double.tryParse(_quantityController.text) ?? 0.0;
 
+    // Validate inputs
     if (id == null || quantity <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(widget.localization.fillInTheFields)),
@@ -340,6 +360,7 @@ class _AddProductionFormState extends State<AddProductionForm> {
       return;
     }
 
+    // Create a new production record
     final newProduction = Production(
       id: id,
       quantity: quantity,
@@ -352,6 +373,7 @@ class _AddProductionFormState extends State<AddProductionForm> {
 
   @override
   Widget build(BuildContext context) {
+    // If no unit is passed, close the form immediately
     if (widget.unit == null) {
       Navigator.pop(context);
     }
@@ -373,12 +395,14 @@ class _AddProductionFormState extends State<AddProductionForm> {
         padding: EdgeInsets.all(16),
         child: Column(
           children: [
+            // Show unit nickname (read-only)
             TextField(
               controller: TextEditingController(text: widget.unit?.nickname),
               decoration: InputDecoration(labelText: localization.unitId),
               enabled: false,
             ),
             TextField(
+              // Input field for production quantity
               controller: _quantityController,
               decoration: InputDecoration(labelText: localization.quantity),
               keyboardType: TextInputType.numberWithOptions(decimal: true),

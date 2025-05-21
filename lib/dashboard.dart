@@ -20,23 +20,29 @@ class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<DatabaseEvent>(
+        // Listen to user's data from Firebase Realtime Database
       stream:
           FirebaseDatabase.instance
               .ref('users/${FirebaseAuth.instance.currentUser?.uid}')
               .onValue,
       builder: (context, snapshot) {
+         // Show loading while waiting for data
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
+        // Show error if there's an issue with the stream
         if (snapshot.hasError) {
           return const Center(child: Text(Localization.errorLoadingData));
         }
+        // Show message if user data is not found
         if (!snapshot.hasData || snapshot.data?.snapshot.value == null) {
           return const Center(child: Text(Localization.noUserDataAvailable));
         }
+        // Get user data from database
         final userData =
             snapshot.data?.snapshot.value as Map<dynamic, dynamic>?;
 
+        // Set language based on user's preference
         Localization localization = englishLocalization;
         if (userData?['language'] == 'Sinhala') {
           localization = sinhalaLocalization;
@@ -67,6 +73,7 @@ class _DashboardState extends State<Dashboard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Welcome message with user’s name
                 Text(
                   '${localization.welcome}, ${userData?['fullName'] ?? 'User'}!',
                   style: const TextStyle(
@@ -98,6 +105,7 @@ class _DashboardState extends State<Dashboard> {
                     ),
                   ],
                   onChanged: (value) {
+                    // Update language selection in the database
                     FirebaseDatabase.instance
                         .ref('users/${FirebaseAuth.instance.currentUser?.uid}')
                         .update({'language': value});
@@ -105,7 +113,7 @@ class _DashboardState extends State<Dashboard> {
                 ),
 
                 const SizedBox(height: 20),
-
+                  // StreamBuilder to listen for user's bee units
                 StreamBuilder<DatabaseEvent>(
                   stream:
                       FirebaseDatabase.instance
@@ -117,6 +125,7 @@ class _DashboardState extends State<Dashboard> {
                     if (!snapshot.hasData) {
                       return SizedBox(height: 40);
                     }
+                      // Parse unit data
                     final unitsData =
                         snapshot.data?.snapshot.value as Map<dynamic, dynamic>?;
                     final List<Unit> units =
@@ -135,6 +144,7 @@ class _DashboardState extends State<Dashboard> {
                                 )
                                 .toList()
                             : [];
+                     // Show status box for units
                     return Container(
                       width: double.infinity,
                       padding: EdgeInsets.symmetric(
@@ -169,7 +179,7 @@ class _DashboardState extends State<Dashboard> {
                 ),
 
                 const SizedBox(height: 20),
-
+                 // Grid of dashboard feature cards
                 Expanded(
                   child: GridView.count(
                     crossAxisCount: 2,
@@ -177,6 +187,7 @@ class _DashboardState extends State<Dashboard> {
                     crossAxisSpacing: 16,
                     childAspectRatio: 1.1,
                     children: [
+                      // Card: Automation
                       dashboardCard(
                         label: localization.automation,
                         image: 'images/automation.jpg',
@@ -189,6 +200,7 @@ class _DashboardState extends State<Dashboard> {
                           );
                         },
                       ),
+                      // Card: Feeding History
                       dashboardCard(
                         label: localization.feedingHistory,
                         image: 'images/feeding_history.png',
@@ -201,6 +213,7 @@ class _DashboardState extends State<Dashboard> {
                           );
                         },
                       ),
+                      // Card: Units
                       dashboardCard(
                         label: localization.units,
                         image: 'images/units.png',
@@ -213,6 +226,7 @@ class _DashboardState extends State<Dashboard> {
                           );
                         },
                       ),
+                      // Card: Production
                       dashboardCard(
                         label: localization.production,
                         image: 'images/production.jpg',
@@ -225,6 +239,7 @@ class _DashboardState extends State<Dashboard> {
                           );
                         },
                       ),
+                      // Card: Insights
                       dashboardCard(
                         label: localization.insights,
                         image: 'images/insights.png',
@@ -248,6 +263,7 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
+  // Helper widget to create each dashboard card
   Widget dashboardCard({
     required String label,
     required String image,
@@ -272,8 +288,10 @@ class _DashboardState extends State<Dashboard> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // Image for the card
             Image.asset(image, height: 60, width: 60, fit: BoxFit.contain),
             const SizedBox(height: 10),
+            // Text label for the card
             Text(
               label,
               style: const TextStyle(

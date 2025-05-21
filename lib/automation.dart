@@ -92,7 +92,8 @@ class _AutomationScreenState extends State<AutomationScreen> {
                                 )
                                 .toList()
                             : [];
-                    if (units.isEmpty) {    // Show message if no units
+                    // Show message if no units
+                    if (units.isEmpty) {    
                       return Center(
                         child: Text(
                           localization.noUnitsFound,
@@ -124,7 +125,7 @@ class _AutomationScreenState extends State<AutomationScreen> {
                   },
                 ),
                 const SizedBox(height: 32),
-                 // Display validation or error message
+                // Display validation or error message
                 if (validationMessage != null)
                   Center(
                     child: Text(
@@ -204,7 +205,7 @@ class _AutomationScreenState extends State<AutomationScreen> {
       );
     }
 
-      // Assess feeding need
+    // Assess feeding need
     (String, double) feed = assessFeeding(
       hiveHumidity: data['humidity'],
       externalTemp: data['temperature'],

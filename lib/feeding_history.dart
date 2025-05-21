@@ -16,17 +16,17 @@ class FeedingHistoryScreen extends StatefulWidget {
   State<FeedingHistoryScreen> createState() => _FeedingHistoryScreenState();
 }
 
-// Feeding History Screen displaying last 6 months' feeding data
+/// State class for FeedingHistoryScreen
 class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
-  Unit? selectedUnit;
-  Map<String, double> monthlySums = {}; // Monthly feed quantities
+  Unit? selectedUnit; // Currently selected bee unit
+  Map<String, double> monthlySums = {}; // Stores sum of feeding quantities by month
   bool loadingHistory = false;
   
-  // Function to load feeding history for the selected unit
+  /// Loads feeding history data from Firebase for the selected unit
   void loadHistory() async {
-    if (selectedUnit == null) return;
+    if (selectedUnit == null) return; // Do nothing if no unit selected
     setState(() {
-      loadingHistory = true;
+      loadingHistory = true; // Show loading spinner
     });
    
    //Get feeding history data from Firebase, sorted by timestamp
@@ -49,7 +49,7 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
           final timestamp = data['timestamp'];
           final quantity = data['quantity'];
 
-          // Filter data within last 6 months
+          // Filter data within  months
           if (timestamp != null && quantity != null) {
             DateTime date = DateTime.fromMillisecondsSinceEpoch(
               (timestamp as num).toInt() * 1000,
@@ -58,6 +58,7 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
               String monthKey = DateFormat(
                 'MMM yyyy',
               ).format(DateTime(date.year, date.month));
+               // Sum feeding quantity for each month
               sums[monthKey] =
                   (sums[monthKey] ?? 0) + (quantity as num).toDouble();
             }
@@ -81,25 +82,29 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    //Get user data stream to fetch language preference
+    // Listen to user data to get language preference and localization
     return StreamBuilder<DatabaseEvent>(
       stream:
           FirebaseDatabase.instance
               .ref('users/${FirebaseAuth.instance.currentUser?.uid}')
               .onValue,
       builder: (context, snapshot) {
+        // Show loading spinner while waiting for user data
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
+        // Show error message if user data fails to load
         if (snapshot.hasError) {
           return const Center(child: Text(Localization.errorLoadingData));
         }
+        // Show message if no user data found
         if (!snapshot.hasData || snapshot.data?.snapshot.value == null) {
           return const Center(child: Text(Localization.noUserDataAvailable));
         }
         final userData =
             snapshot.data?.snapshot.value as Map<dynamic, dynamic>?;
 
+        // Set localization based on user's preferred language
         Localization localization = englishLocalization;
         if (userData?['language'] == 'Sinhala') {
           localization = sinhalaLocalization;
@@ -123,7 +128,7 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // unit selection dropdown
+                // Dropdown to select the bee unit for which feeding history is shown
                 StreamBuilder(
                   stream:
                       FirebaseDatabase.instance
@@ -137,6 +142,7 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
                     }
                     final unitsData =
                         snapshot.data?.snapshot.value as Map<dynamic, dynamic>?;
+                    // Parse units from database snapshot
                     final List<Unit> units =
                         unitsData != null
                             ? unitsData.entries
@@ -154,6 +160,7 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
                                 .toList()
                             : [];
                     if (units.isEmpty) {
+                      // Show message if user has no units
                       return Center(
                         child: Text(
                           localization.noUnitsFound,
@@ -161,6 +168,7 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
                         ),
                       );
                     }
+                    // Dropdown for selecting a unit
                     return DropdownButtonFormField<Unit>(
                       decoration: InputDecoration(
                         labelText: localization.selectTheUnit,
@@ -180,13 +188,13 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
                           selectedUnit = value;
                           monthlySums = {};
                         });
-                        loadHistory(); // Load chart data after unit change
+                        loadHistory();// Load feeding history for selected unit
                       },
                     );
                   },
                 ),
                 const SizedBox(height: 32),
-                // Display loading bar chart
+                // Show loading spinner, no data message, or the feeding bar chart
                 Expanded(
                   child:
                       loadingHistory
@@ -211,17 +219,19 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
     );
   }
 
-  // Build the bar chart using the monthly sums
+  // Builds a bar chart to visualize monthly feeding quantities
   Widget buildBarChart() {
     final spots = monthlySums.entries.toList();
 
     return BarChart(
       BarChartData(
         alignment: BarChartAlignment.spaceAround,
+        // Set maximum y-axis value a bit higher than max feeding amount for padding
         maxY: (monthlySums.values.reduce((a, b) => a > b ? a : b)) * 1.2,
         barTouchData: BarTouchData(
           enabled: true,
           touchTooltipData: BarTouchTooltipData(
+            // Tooltip to show exact feeding amount when user taps a bar
             getTooltipItem: (group, groupIndex, rod, rodIndex) {
               return BarTooltipItem(
                 '${rod.toY.toStringAsFixed(2)}ml',
@@ -234,6 +244,7 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
+              // Display month abbreviation on X axis labels
               getTitlesWidget: (double value, meta) {
                 final index = value.toInt();
                 if (index < spots.length) {
@@ -253,6 +264,7 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
           leftTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
+              // Show integer feeding amount labels on Y axis
               getTitlesWidget: (double value, meta) {
                 return SideTitleWidget(
                   meta: meta,
@@ -268,10 +280,10 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
           rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
           topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
         ),
-        gridData: FlGridData(show: true),
-        borderData: FlBorderData(show: false),
+        gridData: FlGridData(show: true), // Show grid lines for easier reading
+        borderData: FlBorderData(show: false),  // No border around chart
 
-        //generate bar groups from the data
+        // Generate bars for each month with corresponding feeding quantity
         barGroups: List.generate(spots.length, (index) {
           return BarChartGroupData(
             x: index,

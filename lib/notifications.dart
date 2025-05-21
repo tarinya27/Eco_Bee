@@ -18,8 +18,8 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 Future<void> onNotificationTap(NotificationResponse response) async {
   print("Notification tapped: ${response.payload}");
 
-  await Firebase.initializeApp(); // Initialize Firebase in case it's needed (especially in background)
-
+  // Initialize Firebase in case it's needed (especially in background)
+  await Firebase.initializeApp();
   if (response.payload != null) {
     List<String> payloadParts = response.payload!.split(',');
     if (payloadParts.length == 2) {
