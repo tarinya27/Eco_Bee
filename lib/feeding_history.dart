@@ -246,17 +246,20 @@ class _FeedingHistoryScreenState extends State<FeedingHistoryScreen> {
               showTitles: true,
               // Display month abbreviation on X axis labels
               getTitlesWidget: (double value, meta) {
-                final index = value.toInt();
-                if (index < spots.length) {
+                final index = value.toInt(); // Convert the floating value to integer index
+                if (index < spots.length) { // Check if index is within the range of data points
                   return SideTitleWidget(
                     meta: meta,
                     child: Text(
-                      spots[index].key.split(' ')[0], //display month only
+                      //Bars are at whole number positions.
+                      //convert the decimal position to an integer to label each bar correctly.
+                      //display only the month abbreviation
+                      spots[index].key.split(' ')[0],  
                       style: const TextStyle(fontSize: 10),
                     ),
                   );
                 } else {
-                  return const SizedBox.shrink();
+                  return const SizedBox.shrink(); // Return an empty widget if index is out of range (no title)
                 }
               },
             ),
